@@ -10,12 +10,13 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@RequestMapping("/ebook")
 public class EbookController {
 
     @Autowired
     private EbookService ebookService;
 
-    @RequestMapping("/ebook/list")
+    @RequestMapping("/list")
     public CommonResp list() {
         CommonResp<List<Ebook>> resp = new CommonResp<>();
         List<Ebook> list = ebookService.list();
