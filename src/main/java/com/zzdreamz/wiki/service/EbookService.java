@@ -5,6 +5,7 @@ import com.zzdreamz.wiki.domain.EbookExample;
 import com.zzdreamz.wiki.mapper.EbookMapper;
 import com.zzdreamz.wiki.req.EbookReq;
 import com.zzdreamz.wiki.resp.EbookResp;
+import com.zzdreamz.wiki.util.CopyUtil;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,12 +25,6 @@ public class EbookService {
         EbookExample.Criteria criteria = ebookExample.createCriteria();
         criteria.andNameLike("%" + req.getName() + "%");
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
-        List<EbookResp> respList = new ArrayList<>();
-        for (Ebook ebook : ebookList) {
-            EbookResp ebookResp = new EbookResp();
-            BeanUtils.copyProperties(ebook,ebookResp);
-            respList.add(ebookResp);
-        }
-        return respList;
+        return CopyUtil.copyList(ebookList, EbookResp.class);
     }
 }
