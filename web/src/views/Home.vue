@@ -91,7 +91,7 @@ export default defineComponent({
   setup() {
     const ebooks = ref();
     onMounted(() => {
-      axios.get("http://127.0.0.1:8080/ebook/list").then((response) => {
+      axios.get(process.env.VUE_APP_SERVER+"/ebook/list").then((response) => {
         console.log(response)
         const data = response.data;
         ebooks.value = data.content;
@@ -112,3 +112,13 @@ export default defineComponent({
   }
 });
 </script>
+
+<style scoped>
+  .ant-avatar {
+    width: 50px;
+    height: 50px;
+    line-height: 50px;
+    border-radius: 8%;
+    margin: 5px 0;
+  }
+</style>
