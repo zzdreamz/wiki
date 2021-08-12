@@ -3,6 +3,8 @@ package com.zzdreamz.wiki.mapper;
 import com.zzdreamz.wiki.domain.Ebook;
 import com.zzdreamz.wiki.domain.EbookExample;
 import java.util.List;
+
+import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
 public interface EbookMapper {

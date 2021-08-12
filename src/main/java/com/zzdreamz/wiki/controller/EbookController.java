@@ -1,7 +1,7 @@
 package com.zzdreamz.wiki.controller;
 
-import com.zzdreamz.wiki.domain.Test;
-import com.zzdreamz.wiki.service.TestService;
+import com.zzdreamz.wiki.domain.Ebook;
+import com.zzdreamz.wiki.service.EbookService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -9,18 +9,18 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-public class TestController {
+public class EbookController {
 
     @Autowired
-    private TestService testService;
+    private EbookService ebookService;
 
-    @RequestMapping("/test/hello")
+    @RequestMapping("/ebook/hello")
     public String hello() {
         return "Hello World, zzdreamz!!!";
     }
 
-    @RequestMapping("/test/list")
-    public List<Test> list() {
-        return testService.list();
+    @RequestMapping("/ebook/list")
+    public List<Ebook> list() {
+        return ebookService.list();
     }
 }
