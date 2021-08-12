@@ -3,14 +3,12 @@
     <a-layout-sider width="200" style="background: #fff">
       <a-menu
           mode="inline"
-          v-model:selectedKeys="selectedKeys2"
-          v-model:openKeys="openKeys"
           :style="{ height: '100%', borderRight: 0 }"
       >
         <a-sub-menu key="sub1">
           <template #title>
               <span>
-                <user-outlined />
+<!--                <user-outlined />-->
                 subnav 1
               </span>
           </template>
@@ -22,7 +20,7 @@
         <a-sub-menu key="sub2">
           <template #title>
               <span>
-                <laptop-outlined />
+<!--                <laptop-outlined />-->
                 subnav 2
               </span>
           </template>
@@ -34,7 +32,7 @@
         <a-sub-menu key="sub3">
           <template #title>
               <span>
-                <notification-outlined />
+<!--                <notification-outlined />-->
                 subnav 3
               </span>
           </template>
@@ -55,10 +53,14 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import axios from "axios";
 
 export default defineComponent({
   name: 'Home',
-  components: {
-  },
+  setup() {
+    axios.get("http://127.0.0.1:8080/ebook/list?name=Spring").then((response) => {
+      console.log(response)
+    })
+  }
 });
 </script>
