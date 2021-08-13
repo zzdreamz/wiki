@@ -189,13 +189,14 @@ export default defineComponent({
         const data = response.data;
         if (data.success) {
           modalVisible.value = false;
-          modalConfirmLoading.value = false;
-
           handleQuery({
             pageNum: pagination.value.current,
             pageSize: pagination.value.pageSize
           });
+        } else {
+          message.error(data.message);
         }
+        modalConfirmLoading.value = false;
       })
     }
 
