@@ -3,6 +3,13 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
+      <a-input-search
+          v-model:value="searchName"
+          placeholder="输入名称"
+          enter-button
+          @search="onSearch"
+          style="width: 200px"
+      />&ensp;
       <a-button type="primary" @click="add">新增</a-button>
       <a-table
           :columns="columns"
@@ -61,6 +68,7 @@
 import {defineComponent, onMounted, ref} from 'vue';
 import axios from "axios";
 import {message} from "ant-design-vue";
+import {Tool} from "@/util/tool";
 
 export default defineComponent({
   name: 'AdminEbook',
@@ -71,7 +79,10 @@ export default defineComponent({
       current: 1,
       pageSize: 3,
       total: 0
-    })
+    });
+    const queryParam = ref();
+    queryParam.value = {}
+
     const loading = ref(false)
 
     const columns = [
@@ -120,12 +131,13 @@ export default defineComponent({
     // 数据查询
     const handleQuery = (params: any) => {
       loading.value = true;
+
       axios.get("/ebook/list", {
-            params:
-                {
-                  pageNum: params.pageNum,
-                  pageSize: params.pageSize
-                }
+            params: {
+              pageNum: params.pageNum,
+              pageSize: params.pageSize,
+              name: queryParam.value.name
+            }
           }).then((response) => {
         loading.value = false;
         const data = response.data;
@@ -158,7 +170,7 @@ export default defineComponent({
 
     // 编辑
     const edit = (record: any) => {
-      ebook.value = record;
+      ebook.value = Tool.copy(record);
       modalVisible.value = true;
     };
 
@@ -200,6 +212,17 @@ export default defineComponent({
       })
     }
 
+    const searchName = ref();
+    const onSearch = (searchName: any) => {
+      queryParam.value = {
+        name: searchName
+      }
+      handleQuery({
+        pageNum: 1,
+        pageSize: pagination.value.pageSize
+      })
+    }
+
 
     onMounted(() => {
       handleQuery({
@@ -223,6 +246,9 @@ export default defineComponent({
       handleOk,
 
       ebook,
+
+      searchName,
+      onSearch,
     };
   },
 });
