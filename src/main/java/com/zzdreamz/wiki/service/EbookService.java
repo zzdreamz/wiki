@@ -34,7 +34,7 @@ public class EbookService {
             criteria.andNameLike("%" + req.getName() + "%");
         }
         // pageHelper分页查询
-        PageHelper.startPage(1,3);
+        PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
         LOG.info("总行数: {}", pageInfo.getTotal());
