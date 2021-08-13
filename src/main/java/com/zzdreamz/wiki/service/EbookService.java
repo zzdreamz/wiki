@@ -10,6 +10,7 @@ import com.zzdreamz.wiki.req.EbookSaveReq;
 import com.zzdreamz.wiki.resp.EbookQueryResp;
 import com.zzdreamz.wiki.resp.PageResp;
 import com.zzdreamz.wiki.util.CopyUtil;
+import com.zzdreamz.wiki.util.SnowFlake;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,9 @@ public class EbookService {
 
     @Autowired
     private EbookMapper ebookMapper;
+
+    @Autowired
+    private SnowFlake snowFlake;
 
     public PageResp<EbookQueryResp> list(EbookQueryReq req){
         // 添加查询条件
@@ -49,6 +53,12 @@ public class EbookService {
 
     public void save(EbookSaveReq req) {
         Ebook ebook = CopyUtil.copy(req, Ebook.class);
-        ebookMapper.updateByPrimaryKey(ebook);
+        if (ObjectUtils.isEmpty(ebook.getId())) {
+            // 新增
+            ebook.setId(snowFlake.nextId());
+            ebookMapper.insert(ebook);
+        } else {
+            ebookMapper.updateByPrimaryKey(ebook);
+        }
     }
 }
