@@ -40,6 +40,7 @@ public class EbookService {
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
         List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
 
+        // 使用PageResp来封装返回对象
         PageResp<EbookResp> pageResp = new PageResp<>();
         pageResp.setTotal(pageInfo.getTotal());
         pageResp.setList(list);
