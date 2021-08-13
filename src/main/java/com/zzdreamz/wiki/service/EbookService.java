@@ -1,11 +1,15 @@
 package com.zzdreamz.wiki.service;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import com.zzdreamz.wiki.domain.Ebook;
 import com.zzdreamz.wiki.domain.EbookExample;
 import com.zzdreamz.wiki.mapper.EbookMapper;
 import com.zzdreamz.wiki.req.EbookReq;
 import com.zzdreamz.wiki.resp.EbookResp;
 import com.zzdreamz.wiki.util.CopyUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +21,8 @@ import java.util.List;
 @Service
 public class EbookService {
 
+    private static final Logger LOG = LoggerFactory.getLogger(EbookService.class);
+
     @Autowired
     private EbookMapper ebookMapper;
 
@@ -27,7 +33,12 @@ public class EbookService {
         if (!ObjectUtils.isEmpty(req.getName())) {
             criteria.andNameLike("%" + req.getName() + "%");
         }
+        // pageHelper分页查询
+        PageHelper.startPage(1,3);
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
+        PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
+        LOG.info("总行数: {}", pageInfo.getTotal());
+
         return CopyUtil.copyList(ebookList, EbookResp.class);
     }
 }
