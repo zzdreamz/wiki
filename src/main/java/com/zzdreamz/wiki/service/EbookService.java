@@ -7,6 +7,7 @@ import com.zzdreamz.wiki.domain.EbookExample;
 import com.zzdreamz.wiki.mapper.EbookMapper;
 import com.zzdreamz.wiki.req.EbookReq;
 import com.zzdreamz.wiki.resp.EbookResp;
+import com.zzdreamz.wiki.resp.PageResp;
 import com.zzdreamz.wiki.util.CopyUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +27,7 @@ public class EbookService {
     @Autowired
     private EbookMapper ebookMapper;
 
-    public List<EbookResp> list(EbookReq req){
+    public PageResp<EbookResp> list(EbookReq req){
         // 添加查询条件
         EbookExample ebookExample = new EbookExample();
         EbookExample.Criteria criteria = ebookExample.createCriteria();
@@ -37,8 +38,12 @@ public class EbookService {
         PageHelper.startPage(req.getPageNum(), req.getPageSize());
         List<Ebook> ebookList = ebookMapper.selectByExample(ebookExample);
         PageInfo<Ebook> pageInfo = new PageInfo<>(ebookList);
-        LOG.info("总行数: {}", pageInfo.getTotal());
+        List<EbookResp> list = CopyUtil.copyList(ebookList, EbookResp.class);
 
-        return CopyUtil.copyList(ebookList, EbookResp.class);
+        PageResp<EbookResp> pageResp = new PageResp<>();
+        pageResp.setTotal(pageInfo.getTotal());
+        pageResp.setList(list);
+
+        return pageResp;
     }
 }
