@@ -91,9 +91,14 @@ export default defineComponent({
   setup() {
     const ebooks = ref();
     onMounted(() => {
-      axios.get("/ebook/list").then((response) => {
+      axios.get("/ebook/list", {
+        params: {
+          pageNum: 1,
+          pageSize: 1000
+        }
+      }).then((response) => {
         const data = response.data;
-        ebooks.value = data.content;
+        ebooks.value = data.content.list;
       })
     });
 
