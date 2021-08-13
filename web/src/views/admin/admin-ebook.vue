@@ -186,7 +186,6 @@ export default defineComponent({
 
     // 编辑
     const edit = (record: any) => {
-      console.log(record);
       ebook.value = record;
       modalVisible.value = true;
     };
@@ -194,10 +193,19 @@ export default defineComponent({
     // modal的ok事件
     const handleOk = () => {
       modalConfirmLoading.value = true;
-      setTimeout(() => {
-        modalVisible.value = false;
-        modalConfirmLoading.value = false;
-      }, 2000);
+      console.log(ebook.value);
+      axios.post("/ebook/save", ebook.value).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          modalVisible.value = false;
+          modalConfirmLoading.value = false;
+
+          handleQuery({
+            pageNum: pagination.value.current,
+            pageSize: pagination.value.pageSize
+          });
+        }
+      })
     }
 
 
