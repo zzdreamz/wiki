@@ -22,7 +22,10 @@
         <template #cover="{ text: cover }">
           <img v-if="cover" :src="cover" alt="avatar" style="width: 50px" />
         </template>
-        <template v-slot:action="{text, record}">
+        <template #category="{ text: record }">
+          <span>{{ getCategoryName(record.category1Id)}} / {{ getCategoryName(record.category2Id) }}</span>
+        </template>
+        <template #action="{text, record}">
           <a-space size="small">
             <a-button type="primary" @click="edit(record)">编辑</a-button>
             <a-popconfirm
@@ -98,14 +101,9 @@ export default defineComponent({
         dataIndex: 'name',
       },
       {
-        title: '分类1',
-        dataIndex: 'category1Id',
-        key: 'category1Id',
-      },
-      {
-        title: '分类2',
-        dataIndex: 'category2Id',
-        key: 'category2Id',
+        title: '分类',
+        key: 'category',
+        slots: { customRender: 'category' },
       },
       {
         title: '描述',
@@ -231,6 +229,8 @@ export default defineComponent({
 
     // 查询所有分类
     const level1 = ref();
+    let categorys: any[] = [];
+
     const handleQueryCategory = () => {
       loading.value = true;
 
@@ -238,11 +238,10 @@ export default defineComponent({
         loading.value = false;
         const data = response.data;
         if (data.success) {
-          const categorys = data.content;
+          categorys = data.content;
 
           level1.value = [];
           level1.value = Tool.array2Tree(categorys,0);
-          console.log(level1);
 
         } else {
           message.error(data.message);
@@ -250,13 +249,22 @@ export default defineComponent({
       })
     }
 
+    const getCategoryName = (categoryId: any) => {
+      let name = "";
+      categorys.forEach((item: any) => {
+        if (item.id == categoryId) {
+          name = item.name;
+        }
+      });
+      return name;
+    };
 
     onMounted(() => {
+      handleQueryCategory();
       handleQuery({
         pageNum: 1,
         pageSize: pagination.value.pageSize
       });
-      handleQueryCategory();
     });
 
     return {
@@ -279,6 +287,8 @@ export default defineComponent({
       onSearch,
       level1,
       categoryIds,
+
+      getCategoryName,
     };
   },
 });
