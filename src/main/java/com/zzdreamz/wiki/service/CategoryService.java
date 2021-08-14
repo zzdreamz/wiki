@@ -8,6 +8,7 @@ import com.zzdreamz.wiki.mapper.CategoryMapper;
 import com.zzdreamz.wiki.req.CategoryQueryReq;
 import com.zzdreamz.wiki.req.CategorySaveReq;
 import com.zzdreamz.wiki.resp.CategoryQueryResp;
+import com.zzdreamz.wiki.resp.CommonResp;
 import com.zzdreamz.wiki.resp.PageResp;
 import com.zzdreamz.wiki.util.CopyUtil;
 import com.zzdreamz.wiki.util.SnowFlake;
@@ -30,10 +31,24 @@ public class CategoryService {
     @Autowired
     private SnowFlake snowFlake;
 
+    public List<CategoryQueryResp> all(){
+        // 添加查询条件
+        CategoryExample categoryExample = new CategoryExample();
+        // 排序
+        categoryExample.setOrderByClause("sort asc");
+        List<Category> categoryList = categoryMapper.selectByExample(categoryExample);
+        List<CategoryQueryResp> list = CopyUtil.copyList(categoryList, CategoryQueryResp.class);
+
+        return list;
+    }
+
     public PageResp<CategoryQueryResp> list(CategoryQueryReq req){
+        // 添加查询条件
+        CategoryExample categoryExample = new CategoryExample();
+        CategoryExample.Criteria criteria = categoryExample.createCriteria();
         // pageHelper分页查询
         PageHelper.startPage(req.getPageNum(), req.getPageSize());
-        List<Category> categoryList = categoryMapper.selectByExample(null);
+        List<Category> categoryList = categoryMapper.selectByExample(categoryExample);
         PageInfo<Category> pageInfo = new PageInfo<>(categoryList);
         List<CategoryQueryResp> list = CopyUtil.copyList(categoryList, CategoryQueryResp.class);
 
