@@ -7,6 +7,7 @@
           :openKeys="state.openKeys"
           v-model:selectedKeys="state.selectedKeys"
           @openChange="onOpenChange"
+          @click="handleClick"
       >
         <a-menu-item>
           <router-link to="/"><span>欢迎</span></router-link>
@@ -58,6 +59,7 @@ export default defineComponent({
     const ebooks = ref();
     const level1 = ref();
     const state = ref();
+    let category2Id: any;
     state.value ={
       rootSubmenuKeys: [],
       openKeys: [],
@@ -68,7 +70,8 @@ export default defineComponent({
       axios.get("/ebook/list", {
         params: {
           pageNum: 1,
-          pageSize: 1000
+          pageSize: 1000,
+          category2Id: category2Id
         }
       }).then((response) => {
         const data = response.data;
@@ -102,6 +105,11 @@ export default defineComponent({
       }
     };
 
+    const handleClick = (key: any) => {
+      category2Id = key.key;
+      handlerQueryEbooks();
+    }
+
     onMounted(() => {
       handleQueryCategory();
       handlerQueryEbooks();
@@ -122,6 +130,7 @@ export default defineComponent({
       state,
       onOpenChange,
       level1,
+      handleClick,
     }
   }
 });
