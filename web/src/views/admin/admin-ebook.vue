@@ -51,11 +51,13 @@
       <a-form-item label="名称">
         <a-input v-model:value="ebook.name" />
       </a-form-item>
-      <a-form-item label="分类一">
-        <a-input v-model:value="ebook.category1Id" />
-      </a-form-item>
-      <a-form-item label="分类二">
-        <a-input v-model:value="ebook.category2Id" />
+      <a-form-item label="分类">
+        <a-cascader
+            v-model:value="categoryIds"
+            :options="level1"
+            :field-names="{label: 'name', value: 'id', children: 'children'}"
+            placeholder="Please select"
+        />
       </a-form-item>
       <a-form-item label="描述">
         <a-input v-model:value="ebook.description" />
@@ -161,6 +163,8 @@ export default defineComponent({
       })
     }
 
+    const categoryIds = ref();
+
     // modal相关变量
     const modalVisible = ref<boolean>(false);
     const modalConfirmLoading = ref<boolean>(false);
@@ -171,6 +175,7 @@ export default defineComponent({
     // 编辑
     const edit = (record: any) => {
       ebook.value = Tool.copy(record);
+      categoryIds.value = [ebook.value.category1Id, ebook.value.category2Id]
       modalVisible.value = true;
     };
 
@@ -196,7 +201,8 @@ export default defineComponent({
     // modal的ok事件
     const handleOk = () => {
       modalConfirmLoading.value = true;
-      console.log(ebook.value);
+      ebook.value.category1Id = categoryIds.value[0];
+      ebook.value.category2Id = categoryIds.value[1];
       axios.post("/ebook/save", ebook.value).then((response) => {
         const data = response.data;
         if (data.success) {
@@ -223,12 +229,34 @@ export default defineComponent({
       })
     }
 
+    // 查询所有分类
+    const level1 = ref();
+    const handleQueryCategory = () => {
+      loading.value = true;
+
+      axios.get("/category/all").then((response) => {
+        loading.value = false;
+        const data = response.data;
+        if (data.success) {
+          const categorys = data.content;
+
+          level1.value = [];
+          level1.value = Tool.array2Tree(categorys,0);
+          console.log(level1);
+
+        } else {
+          message.error(data.message);
+        }
+      })
+    }
+
 
     onMounted(() => {
       handleQuery({
         pageNum: 1,
         pageSize: pagination.value.pageSize
       });
+      handleQueryCategory();
     });
 
     return {
@@ -249,6 +277,8 @@ export default defineComponent({
 
       searchName,
       onSearch,
+      level1,
+      categoryIds,
     };
   },
 });
