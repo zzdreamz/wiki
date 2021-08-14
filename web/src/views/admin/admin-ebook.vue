@@ -243,6 +243,11 @@ export default defineComponent({
           level1.value = [];
           level1.value = Tool.array2Tree(categorys,0);
 
+          // 加载完所有分类后再去查询电子书，否则渲染会出错
+          handleQuery({
+            pageNum: 1,
+            pageSize: pagination.value.pageSize
+          });
         } else {
           message.error(data.message);
         }
@@ -261,10 +266,6 @@ export default defineComponent({
 
     onMounted(() => {
       handleQueryCategory();
-      handleQuery({
-        pageNum: 1,
-        pageSize: pagination.value.pageSize
-      });
     });
 
     return {
