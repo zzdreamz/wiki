@@ -40,6 +40,7 @@ public class DocController {
     public CommonResp save(@Valid @RequestBody DocSaveReq req) {
         CommonResp resp = new CommonResp<>();
         docService.save(req);
+        resp.setMessage("文档保存成功");
         return resp;
     }
 

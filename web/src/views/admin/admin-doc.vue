@@ -229,25 +229,25 @@ export default defineComponent({
       })
     }
 
-    // modal的ok事件
     const handleSave = () => {
-      modalConfirmLoading.value = true;
+      doc.value.content = editor.txt.html();
+      doc.value.ebookId = route.query.ebookId;
       axios.post("/doc/save", doc.value).then((response) => {
         const data = response.data;
         if (data.success) {
-          modalVisible.value = false;
+          message.success(data.message);
           handleQuery();
         } else {
           message.error(data.message);
         }
-        modalConfirmLoading.value = false;
       })
     }
 
+    let editor :any;
 
     onMounted(() => {
       handleQuery();
-      const editor = new E('#docContent');
+      editor = new E('#docContent')
       editor.config.zIndex=0;
       editor.create();
     });

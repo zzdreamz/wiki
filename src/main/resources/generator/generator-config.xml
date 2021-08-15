@@ -40,9 +40,9 @@
                              targetPackage="com.zzdreamz.wiki.mapper"
                              type="XMLMAPPER"/>
 
-        <table tableName="ebook"/>
-        <table tableName="category"/>
-        <table tableName="doc"/>
+<!--        <table tableName="ebook"/>-->
+<!--        <table tableName="category"/>-->
+<!--        <table tableName="doc"/>-->
         <table tableName="content"/>
     </context>
 </generatorConfiguration>

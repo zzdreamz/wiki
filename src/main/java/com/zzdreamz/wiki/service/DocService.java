@@ -2,8 +2,10 @@ package com.zzdreamz.wiki.service;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.zzdreamz.wiki.domain.Content;
 import com.zzdreamz.wiki.domain.Doc;
 import com.zzdreamz.wiki.domain.DocExample;
+import com.zzdreamz.wiki.mapper.ContentMapper;
 import com.zzdreamz.wiki.mapper.DocMapper;
 import com.zzdreamz.wiki.req.DocQueryReq;
 import com.zzdreamz.wiki.req.DocSaveReq;
@@ -28,6 +30,10 @@ public class DocService {
     private DocMapper docMapper;
 
     @Autowired
+    private ContentMapper contentMapper;
+
+
+    @Autowired
     private SnowFlake snowFlake;
 
     public List<DocQueryResp> all(){
@@ -44,6 +50,7 @@ public class DocService {
     public List<DocQueryResp> list(DocQueryReq req){
         // 添加查询条件
         DocExample docExample = new DocExample();
+        docExample.setOrderByClause("sort asc");
         DocExample.Criteria criteria = docExample.createCriteria();
         criteria.andEbookIdEqualTo(req.getEbookId());
         List<Doc> docList = docMapper.selectByExample(docExample);
@@ -54,12 +61,19 @@ public class DocService {
 
     public void save(DocSaveReq req) {
         Doc doc = CopyUtil.copy(req, Doc.class);
+        Content content = CopyUtil.copy(req, Content.class);
+        System.out.println(content);
         if (ObjectUtils.isEmpty(doc.getId())) {
             // 新增
             doc.setId(snowFlake.nextId());
             docMapper.insert(doc);
+
+            content.setId(doc.getId());
+            contentMapper.insert(content);
         } else {
             docMapper.updateByPrimaryKey(doc);
+            int count = contentMapper.updateByPrimaryKeyWithBLOBs(content);
+            if (count == 0) contentMapper.insert(content);
         }
     }
 
