@@ -53,8 +53,12 @@
       <a-form-item label="顺序">
         <a-input v-model:value="doc.sort"/>
       </a-form-item>
+      <a-form-item label="内容">
+        <div id="docContent"></div>
+      </a-form-item>
     </a-form>
   </a-modal>
+
 </template>
 
 <script lang="ts">
@@ -63,6 +67,7 @@ import axios from "axios";
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
 import {useRoute} from "vue-router";
+import E from 'wangeditor'
 
 
 export default defineComponent({
@@ -73,7 +78,6 @@ export default defineComponent({
     const docs = ref();
     const level1 = ref();
     const treeData = ref();
-    treeData.value = [];
 
     const loading = ref(false)
 
@@ -103,7 +107,11 @@ export default defineComponent({
     const handleQuery = () => {
       loading.value = true;
 
-      axios.get("/doc/all").then((response) => {
+      axios.get("/doc/list", {
+        params: {
+          ebookId: route.query.ebookId,
+        }
+      }).then((response) => {
         loading.value = false;
         const data = response.data;
         if (data.success) {
@@ -134,7 +142,7 @@ export default defineComponent({
           const children = node.children;
           if (Tool.isNotEmpty(children)) {
             for (let j = 0; j < children.length; j++) {
-              setDisable(children,children[j].id);
+              setDisable(children, children[j].id);
             }
           }
         } else {
@@ -146,10 +154,34 @@ export default defineComponent({
       }
     }
 
+    let ids: any[] = [];
+    // 将某节点及其子孙节点设置为disabled
+    const getDeleteIds = (treeData: any, id: any) => {
+      for (let i = 0; i < treeData.length; i++) {
+        const node = treeData[i];
+        if (node.id == id) {
+          ids.push(id);
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              getDeleteIds(children, children[j].id);
+            }
+          }
+        } else {
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            getDeleteIds(children, id);
+          }
+        }
+      }
+    }
+
     // 编辑
     const edit = (record: any) => {
       doc.value = Tool.copy(record);
       modalVisible.value = true;
+      const editor = new E('#docContent');
+      editor.create();
 
       // 不能选择当前节点极其子孙节点
       treeData.value = Tool.copy(level1.value);
@@ -165,17 +197,25 @@ export default defineComponent({
         ebookId: route.query.ebookId,
       };
       modalVisible.value = true;
+      const editor = new E('#docContent');
+      editor.create();
 
       treeData.value = Tool.copy(level1.value);
       // 为选择树添加一个无
-      treeData.value.unshift({id: 0, name: '无'});
+      if (Tool.isEmpty(treeData.value)) {
+        treeData.value = [{id: 0, name: '无'}];
+      } else {
+        treeData.value.unshift({id: 0, name: '无'});
+      }
     };
 
     // 删除
     const handleDelete = (id: any) => {
-      axios.delete("/doc/delete/" + id).then((response) => {
+      getDeleteIds(level1.value, id);
+      axios.delete("/doc/delete/" + ids.join(',')).then((response) => {
         const data = response.data;
         if (data.success) {
+          ids = [];
           handleQuery();
         }
       })

@@ -41,22 +41,15 @@ public class DocService {
         return list;
     }
 
-    public PageResp<DocQueryResp> list(DocQueryReq req){
+    public List<DocQueryResp> list(DocQueryReq req){
         // 添加查询条件
         DocExample docExample = new DocExample();
         DocExample.Criteria criteria = docExample.createCriteria();
-        // pageHelper分页查询
-        PageHelper.startPage(req.getPageNum(), req.getPageSize());
+        criteria.andEbookIdEqualTo(req.getEbookId());
         List<Doc> docList = docMapper.selectByExample(docExample);
-        PageInfo<Doc> pageInfo = new PageInfo<>(docList);
         List<DocQueryResp> list = CopyUtil.copyList(docList, DocQueryResp.class);
 
-        // 使用PageResp来封装返回对象
-        PageResp<DocQueryResp> pageResp = new PageResp<>();
-        pageResp.setTotal(pageInfo.getTotal());
-        pageResp.setList(list);
-
-        return pageResp;
+        return list;
     }
 
     public void save(DocSaveReq req) {
@@ -72,5 +65,12 @@ public class DocService {
 
     public void delete(Long id) {
         docMapper.deleteByPrimaryKey(id);
+    }
+
+    public void delete(List<String> ids) {
+        DocExample docExample = new DocExample();
+        DocExample.Criteria criteria = docExample.createCriteria();
+        criteria.andIdIn(ids);
+        docMapper.deleteByExample(docExample);
     }
 }
