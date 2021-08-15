@@ -191,7 +191,7 @@ export default defineComponent({
     // 编辑
     const edit = (record: any) => {
       doc.value = Tool.copy(record);
-      modalVisible.value = true;
+      handleQueryContent(doc.value.id);
 
       // 不能选择当前节点极其子孙节点
       treeData.value = Tool.copy(level1.value);
@@ -206,7 +206,7 @@ export default defineComponent({
       doc.value = {
         ebookId: route.query.ebookId,
       };
-      modalVisible.value = true;
+      editor.txt.html('');
 
       treeData.value = Tool.copy(level1.value);
       // 为选择树添加一个无
@@ -232,11 +232,25 @@ export default defineComponent({
     const handleSave = () => {
       doc.value.content = editor.txt.html();
       doc.value.ebookId = route.query.ebookId;
+      delete doc.value.children;
+      if (Tool.isNotEmpty(doc.value.children)) doc.value.children = doc.value.children.join(",");
       axios.post("/doc/save", doc.value).then((response) => {
         const data = response.data;
         if (data.success) {
           message.success(data.message);
           handleQuery();
+        } else {
+          message.error(data.message);
+        }
+      })
+    }
+
+
+    const handleQueryContent = (id: any) => {
+      axios.get("/doc/find-content/" + id).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          editor.txt.html(data.content);
         } else {
           message.error(data.message);
         }
