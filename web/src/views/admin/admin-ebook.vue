@@ -27,6 +27,9 @@
         </template>
         <template #action="{text, record}">
           <a-space size="small">
+            <router-link to="/admin/doc">
+              <a-button type="primary">文档树</a-button>
+            </router-link>
             <a-button type="primary" @click="edit(record)">编辑</a-button>
             <a-popconfirm
                 title="删除后不可恢复，确认删除？"
