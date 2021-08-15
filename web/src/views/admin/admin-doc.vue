@@ -3,61 +3,69 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-button type="primary" @click="add">新增</a-button>
-      <a-table
-          :columns="columns"
-          :row-key="record => record.id"
-          :data-source="level1"
-          :loading="loading"
-          :pagination="false"
-      >
-        <template v-slot:action="{text, record}">
-          <a-space size="small">
-            <a-button type="primary" @click="edit(record)">编辑</a-button>
-            <a-popconfirm
-                title="删除后不可恢复，确认删除？"
-                ok-text="Yes"
-                cancel-text="No"
-                @confirm="handleDelete(record.id)"
-            >
-              <a-button type="danger">删除</a-button>
-            </a-popconfirm>
-          </a-space>
-        </template>
-      </a-table>
+      <a-row>
+        <a-col :span="8">
+          <a-button type="primary" @click="add">新增</a-button>
+          <a-table
+              :columns="columns"
+              :row-key="record => record.id"
+              :data-source="level1"
+              :loading="loading"
+              :pagination="false"
+          >
+            <template v-slot:action="{text, record}">
+              <a-space size="small">
+                <a-button type="primary" @click="edit(record)">编辑</a-button>
+                <a-popconfirm
+                    title="删除后不可恢复，确认删除？"
+                    ok-text="Yes"
+                    cancel-text="No"
+                    @confirm="handleDelete(record.id)"
+                >
+                  <a-button type="danger">删除</a-button>
+                </a-popconfirm>
+              </a-space>
+            </template>
+          </a-table>
+        </a-col>
+        <a-col :span="16">
+          <a-form :model="doc" :label-col="{span: 6}" :wrapper-col="{span: 16}">
+            <a-form-item label="名称">
+              <a-input v-model:value="doc.name"/>
+            </a-form-item>
+            <a-form-item label="父文档">
+              <a-tree-select
+                  v-model:value="doc.parent"
+                  style="width: 100%"
+                  :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+                  :tree-data="treeData"
+                  placeholder="请选择父文档"
+                  tree-default-expand-all
+                  :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+              >
+
+              </a-tree-select>
+            </a-form-item>
+            <a-form-item label="顺序">
+              <a-input v-model:value="doc.sort"/>
+            </a-form-item>
+            <a-form-item label="内容">
+              <div id="docContent"></div>
+            </a-form-item>
+          </a-form>
+        </a-col>
+      </a-row>
+
     </a-layout-content>
   </a-layout>
-  <a-modal
-      title="文档表单"
-      v-model:visible="modalVisible"
-      :confirm-loading="modalConfirmLoading"
-      @ok="handleOk"
-  >
-    <a-form :model="doc" :label-col="{span: 6}" :wrapper-col="{span: 12}">
-      <a-form-item label="名称">
-        <a-input v-model:value="doc.name"/>
-      </a-form-item>
-      <a-form-item label="父文档">
-        <a-tree-select
-            v-model:value="doc.parent"
-            style="width: 100%"
-            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
-            :tree-data="treeData"
-            placeholder="请选择父文档"
-            tree-default-expand-all
-            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
-        >
+<!--  <a-modal-->
+<!--      title="文档表单"-->
+<!--      v-model:visible="modalVisible"-->
+<!--      :confirm-loading="modalConfirmLoading"-->
+<!--      @ok="handleOk"-->
+<!--  >-->
 
-        </a-tree-select>
-      </a-form-item>
-      <a-form-item label="顺序">
-        <a-input v-model:value="doc.sort"/>
-      </a-form-item>
-      <a-form-item label="内容">
-        <div id="docContent"></div>
-      </a-form-item>
-    </a-form>
-  </a-modal>
+<!--  </a-modal>-->
 
 </template>
 
@@ -78,6 +86,7 @@ export default defineComponent({
     const docs = ref();
     const level1 = ref();
     const treeData = ref();
+    treeData.value = [{name: '无', id: '0'}];
 
     const loading = ref(false)
 
@@ -132,6 +141,7 @@ export default defineComponent({
 
     // 文档数据
     const doc = ref()
+    doc.value = {};
 
     // 将某节点及其子孙节点设置为disabled
     const setDisable = (treeData: any, id: any) => {
@@ -180,8 +190,6 @@ export default defineComponent({
     const edit = (record: any) => {
       doc.value = Tool.copy(record);
       modalVisible.value = true;
-      const editor = new E('#docContent');
-      editor.create();
 
       // 不能选择当前节点极其子孙节点
       treeData.value = Tool.copy(level1.value);
@@ -197,8 +205,6 @@ export default defineComponent({
         ebookId: route.query.ebookId,
       };
       modalVisible.value = true;
-      const editor = new E('#docContent');
-      editor.create();
 
       treeData.value = Tool.copy(level1.value);
       // 为选择树添加一个无
@@ -236,8 +242,11 @@ export default defineComponent({
       })
     }
 
+
     onMounted(() => {
       handleQuery();
+      const editor = new E('#docContent');
+      editor.create();
     });
 
     return {
