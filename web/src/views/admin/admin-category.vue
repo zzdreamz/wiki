@@ -102,7 +102,6 @@ export default defineComponent({
 
           level1.value = [];
           level1.value = Tool.array2Tree(categorys.value,0);
-          console.log(level1);
 
         } else {
           message.error(data.message);
@@ -142,7 +141,6 @@ export default defineComponent({
     // modal的ok事件
     const handleOk = () => {
       modalConfirmLoading.value = true;
-      console.log(category.value);
       axios.post("/category/save", category.value).then((response) => {
         const data = response.data;
         if (data.success) {

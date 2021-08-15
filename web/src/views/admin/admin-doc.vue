@@ -50,18 +50,6 @@
 
         </a-tree-select>
       </a-form-item>
-      <a-form-item label="父文档">
-        <a-select
-            ref="select"
-            v-model:value="doc.parent"
-        >
-          <a-select-option value="0">无</a-select-option>
-          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id === c.id">{{
-              c.name
-            }}
-          </a-select-option>
-        </a-select>
-      </a-form-item>
       <a-form-item label="顺序">
         <a-input v-model:value="doc.sort"/>
       </a-form-item>
@@ -74,11 +62,14 @@ import {defineComponent, onMounted, ref} from 'vue';
 import axios from "axios";
 import {message} from "ant-design-vue";
 import {Tool} from "@/util/tool";
+import {useRoute} from "vue-router";
+
 
 export default defineComponent({
   name: 'AdminDoc',
   setup() {
 
+    const route = useRoute();
     const docs = ref();
     const level1 = ref();
     const treeData = ref();
@@ -120,7 +111,6 @@ export default defineComponent({
 
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
-          console.log(level1);
 
         } else {
           message.error(data.message);
@@ -171,7 +161,9 @@ export default defineComponent({
 
     // 新增
     const add = () => {
-      doc.value = {};
+      doc.value = {
+        ebookId: route.query.ebookId,
+      };
       modalVisible.value = true;
 
       treeData.value = Tool.copy(level1.value);
@@ -192,7 +184,6 @@ export default defineComponent({
     // modal的ok事件
     const handleOk = () => {
       modalConfirmLoading.value = true;
-      console.log(doc.value);
       axios.post("/doc/save", doc.value).then((response) => {
         const data = response.data;
         if (data.success) {
