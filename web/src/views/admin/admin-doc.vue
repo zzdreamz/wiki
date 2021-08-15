@@ -3,8 +3,9 @@
     <a-layout-content
         :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
     >
-      <a-row>
-        <a-col :span="8">
+      <a-row :gutter="96">
+        <a-col :span="3"></a-col>
+        <a-col :span="9">
           <a-button type="primary" @click="add">新增</a-button>
           <a-table
               :columns="columns"
@@ -12,7 +13,11 @@
               :data-source="level1"
               :loading="loading"
               :pagination="false"
+              size="small"
           >
+            <template #name="{text, record}">
+              {{record.sort}} {{record.name}}
+            </template>
             <template v-slot:action="{text, record}">
               <a-space size="small">
                 <a-button type="primary" @click="edit(record)">编辑</a-button>
@@ -28,12 +33,15 @@
             </template>
           </a-table>
         </a-col>
-        <a-col :span="16">
-          <a-form :model="doc" :label-col="{span: 6}" :wrapper-col="{span: 16}">
-            <a-form-item label="名称">
-              <a-input v-model:value="doc.name"/>
+        <a-col :span="12">
+          <a-form :model="doc" :label-col="{span: 6}" :wrapper-col="{span: 20}">
+            <a-form-item label="">
+              <a-button type="primary" @click="handleSave">保存</a-button>
             </a-form-item>
-            <a-form-item label="父文档">
+            <a-form-item label="">
+              <a-input v-model:value="doc.name" placeholder="文档名称"/>
+            </a-form-item>
+            <a-form-item label="">
               <a-tree-select
                   v-model:value="doc.parent"
                   style="width: 100%"
@@ -46,10 +54,10 @@
 
               </a-tree-select>
             </a-form-item>
-            <a-form-item label="顺序">
-              <a-input v-model:value="doc.sort"/>
+            <a-form-item label="">
+              <a-input v-model:value="doc.sort" placeholder="顺序"/>
             </a-form-item>
-            <a-form-item label="内容">
+            <a-form-item label="">
               <div id="docContent"></div>
             </a-form-item>
           </a-form>
@@ -96,14 +104,8 @@ export default defineComponent({
         dataIndex: 'name',
       },
       {
-        title: '父文档',
-        dataIndex: 'parent',
-        key: 'parent',
-      },
-      {
-        title: '顺序',
-        dataIndex: 'sort',
-        key: 'sort',
+        title: '顺序 名称',
+        slots: {customRender: 'name'},
       },
       {
         title: '操作',
@@ -228,7 +230,7 @@ export default defineComponent({
     }
 
     // modal的ok事件
-    const handleOk = () => {
+    const handleSave = () => {
       modalConfirmLoading.value = true;
       axios.post("/doc/save", doc.value).then((response) => {
         const data = response.data;
@@ -246,6 +248,7 @@ export default defineComponent({
     onMounted(() => {
       handleQuery();
       const editor = new E('#docContent');
+      editor.config.zIndex=0;
       editor.create();
     });
 
@@ -259,7 +262,7 @@ export default defineComponent({
       edit,
       add,
       handleDelete,
-      handleOk,
+      handleSave,
 
       doc,
       treeData,
