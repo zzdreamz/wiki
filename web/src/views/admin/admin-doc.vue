@@ -35,7 +35,20 @@
   >
     <a-form :model="doc" :label-col="{span: 6}" :wrapper-col="{span: 12}">
       <a-form-item label="名称">
-        <a-input v-model:value="doc.name" />
+        <a-input v-model:value="doc.name"/>
+      </a-form-item>
+      <a-form-item label="父文档">
+        <a-tree-select
+            v-model:value="doc.parent"
+            style="width: 100%"
+            :dropdown-style="{ maxHeight: '400px', overflow: 'auto' }"
+            :tree-data="treeData"
+            placeholder="请选择父文档"
+            tree-default-expand-all
+            :replaceFields="{title: 'name', key: 'id', value: 'id'}"
+        >
+
+        </a-tree-select>
       </a-form-item>
       <a-form-item label="父文档">
         <a-select
@@ -43,11 +56,14 @@
             v-model:value="doc.parent"
         >
           <a-select-option value="0">无</a-select-option>
-          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id === c.id">{{ c.name }}</a-select-option>
+          <a-select-option v-for="c in level1" :key="c.id" :value="c.id" :disabled="doc.id === c.id">{{
+              c.name
+            }}
+          </a-select-option>
         </a-select>
       </a-form-item>
       <a-form-item label="顺序">
-        <a-input v-model:value="doc.sort" />
+        <a-input v-model:value="doc.sort"/>
       </a-form-item>
     </a-form>
   </a-modal>
@@ -65,6 +81,8 @@ export default defineComponent({
 
     const docs = ref();
     const level1 = ref();
+    const treeData = ref();
+    treeData.value = [];
 
     const loading = ref(false)
 
@@ -86,7 +104,7 @@ export default defineComponent({
       {
         title: '操作',
         key: 'action',
-        slots: { customRender: 'action' },
+        slots: {customRender: 'action'},
       },
     ];
 
@@ -101,7 +119,7 @@ export default defineComponent({
           docs.value = data.content;
 
           level1.value = [];
-          level1.value = Tool.array2Tree(docs.value,0);
+          level1.value = Tool.array2Tree(docs.value, 0);
           console.log(level1);
 
         } else {
@@ -117,16 +135,48 @@ export default defineComponent({
     // 文档数据
     const doc = ref()
 
+    // 将某节点及其子孙节点设置为disabled
+    const setDisable = (treeData: any, id: any) => {
+      for (let i = 0; i < treeData.length; i++) {
+        const node = treeData[i];
+        if (node.id == id) {
+          node.disabled = true;
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            for (let j = 0; j < children.length; j++) {
+              setDisable(children,children[j].id);
+            }
+          }
+        } else {
+          const children = node.children;
+          if (Tool.isNotEmpty(children)) {
+            setDisable(children, id);
+          }
+        }
+      }
+    }
+
     // 编辑
     const edit = (record: any) => {
       doc.value = Tool.copy(record);
       modalVisible.value = true;
+
+      // 不能选择当前节点极其子孙节点
+      treeData.value = Tool.copy(level1.value);
+      setDisable(treeData.value, record.id);
+
+      // 为选择树添加一个无
+      treeData.value.unshift({id: 0, name: '无'});
     };
 
     // 新增
     const add = () => {
       doc.value = {};
       modalVisible.value = true;
+
+      treeData.value = Tool.copy(level1.value);
+      // 为选择树添加一个无
+      treeData.value.unshift({id: 0, name: '无'});
     };
 
     // 删除
@@ -172,6 +222,7 @@ export default defineComponent({
       handleOk,
 
       doc,
+      treeData,
     };
   },
 });
