@@ -1,6 +1,6 @@
 <template>
-  <a-layout>
-    <a-layout-sider width="200" style="background: #fff">
+  <a-row type="flex" justify="center">
+    <a-col :span="4">
       <a-tree
           v-if="level1!=null && level1.length > 0"
           class="draggable-tree"
@@ -9,13 +9,11 @@
           :defaultExpandAll="true"
           @select="onSelect"
       />
-    </a-layout-sider>
-    <a-layout-content
-        :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }"
-    >
+    </a-col>
+    <a-col :span="12">
       <div v-html="html" class="wangeditor"></div>
-    </a-layout-content>
-  </a-layout>
+    </a-col>
+  </a-row>
 </template>
 
 <script lang="ts">
