@@ -94,7 +94,7 @@ export default defineComponent({
     const docs = ref();
     const level1 = ref();
     const treeData = ref();
-    treeData.value = [{name: '无', id: '0'}];
+    treeData.value = [];
 
     const loading = ref(false)
 
@@ -130,6 +130,9 @@ export default defineComponent({
 
           level1.value = [];
           level1.value = Tool.array2Tree(docs.value, 0);
+
+          treeData.value = Tool.copy(level1.value);
+          treeData.value.unshift({id: 0, name: '无'});
 
         } else {
           message.error(data.message);
