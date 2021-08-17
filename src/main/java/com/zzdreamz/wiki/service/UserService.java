@@ -8,6 +8,7 @@ import com.zzdreamz.wiki.exception.BusinessException;
 import com.zzdreamz.wiki.exception.BusinessExceptionCode;
 import com.zzdreamz.wiki.mapper.UserMapper;
 import com.zzdreamz.wiki.req.UserQueryReq;
+import com.zzdreamz.wiki.req.UserResetPasswordReq;
 import com.zzdreamz.wiki.req.UserSaveReq;
 import com.zzdreamz.wiki.resp.UserQueryResp;
 import com.zzdreamz.wiki.resp.PageResp;
@@ -95,5 +96,10 @@ public class UserService {
         } else {
             return userList.get(0);
         }
+    }
+
+    public void resetPassword(UserResetPasswordReq req) {
+        User user = CopyUtil.copy(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
     }
 }

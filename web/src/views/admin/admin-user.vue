@@ -21,6 +21,7 @@
       >
         <template #action="{text, record}">
           <a-space size="small">
+            <a-button type="primary" @click="resetPassword(record)">重置密码</a-button>
             <a-button type="primary" @click="edit(record)">编辑</a-button>
             <a-popconfirm
                 title="删除后不可恢复，确认删除？"
@@ -49,6 +50,18 @@
         <a-input v-model:value="user.name" />
       </a-form-item>
       <a-form-item label="密码" v-show="!user.id">
+        <a-input v-model:value="user.password" />
+      </a-form-item>
+    </a-form>
+  </a-modal>
+  <a-modal
+      title="用户表单"
+      v-model:visible="resetModalVisible"
+      :confirm-loading="resetModalConfirmLoading"
+      @ok="resetHandleOk"
+  >
+    <a-form :model="user" :label-col="{span: 6}" :wrapper-col="{span: 12}">
+      <a-form-item label="密码">
         <a-input v-model:value="user.password" />
       </a-form-item>
     </a-form>
@@ -197,6 +210,36 @@ export default defineComponent({
       })
     }
 
+    // 重置密码
+    const resetModalVisible = ref();
+    resetModalVisible.value = false;
+    const resetModalConfirmLoading = ref();
+    resetModalConfirmLoading.value = false;
+    const resetPassword = (record: any) => {
+      user.value = Tool.copy(record);
+      user.value.password = null;
+      resetModalVisible.value = true;
+    };
+    const resetHandleOk = () => {
+      resetModalConfirmLoading.value = true;
+      user.value.password = hexMd5(user.value.password+KEY);
+      delete user.value.name;
+      delete user.value.loginName;
+      axios.post("/user/reset-password", user.value).then((response) => {
+        const data = response.data;
+        if (data.success) {
+          resetModalVisible.value = false;
+          handleQuery({
+            pageNum: pagination.value.current,
+            pageSize: pagination.value.pageSize
+          });
+        } else {
+          message.error(data.message);
+        }
+        resetModalConfirmLoading.value = false;
+      })
+    }
+
     onMounted(() => {
       handleQuery({
         pageNum: 1,
@@ -222,6 +265,11 @@ export default defineComponent({
 
       searchName,
       onSearch,
+
+      resetPassword,
+      resetModalVisible,
+      resetModalConfirmLoading,
+      resetHandleOk,
     };
   },
 });
