@@ -34,7 +34,7 @@ public class UserService {
     @Autowired
     private SnowFlake snowFlake;
 
-    public PageResp<UserQueryResp> list(UserQueryReq req){
+    public PageResp<UserQueryResp> list(UserQueryReq req) {
         // 添加查询条件
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
@@ -57,16 +57,16 @@ public class UserService {
 
     public void save(UserSaveReq req) {
         User user = CopyUtil.copy(req, User.class);
-        if (ObjectUtils.isEmpty(user.getId())) {
-            // 新增
-            if (ObjectUtils.isEmpty(selectByLoginName(req.getLoginName()))){
+        if (ObjectUtils.isEmpty(selectByLoginName(req.getLoginName()))) {
+            if (ObjectUtils.isEmpty(user.getId())) {
+                // 新增
                 user.setId(snowFlake.nextId());
                 userMapper.insert(user);
             } else {
-                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+                userMapper.updateByPrimaryKey(user);
             }
         } else {
-            userMapper.updateByPrimaryKey(user);
+            throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
         }
     }
 
@@ -78,7 +78,7 @@ public class UserService {
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
         if (!ObjectUtils.isEmpty(loginName)) {
-            criteria.andLoginNameEqualTo(loginName );
+            criteria.andLoginNameEqualTo(loginName);
         }
         List<User> userList = userMapper.selectByExample(userExample);
         if (CollectionUtils.isEmpty(userList)) {
