@@ -74,7 +74,7 @@
       distinct
     </if>
     <include refid="Base_Column_List" />
-    from wiki..user
+    from wiki.user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
@@ -85,27 +85,27 @@
   <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
     select 
     <include refid="Base_Column_List" />
-    from wiki..user
+    from wiki.user
     where id = #{id,jdbcType=BIGINT}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
-    delete from wiki..user
+    delete from wiki.user
     where id = #{id,jdbcType=BIGINT}
   </delete>
   <delete id="deleteByExample" parameterType="com.zzdreamz.wiki.domain.UserExample">
-    delete from wiki..user
+    delete from wiki.user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </delete>
   <insert id="insert" parameterType="com.zzdreamz.wiki.domain.User">
-    insert into wiki..user (id, login_name, `name`, 
+    insert into wiki.user (id, login_name, `name`, 
       `password`)
     values (#{id,jdbcType=BIGINT}, #{loginName,jdbcType=VARCHAR}, #{name,jdbcType=VARCHAR}, 
       #{password,jdbcType=CHAR})
   </insert>
   <insert id="insertSelective" parameterType="com.zzdreamz.wiki.domain.User">
-    insert into wiki..user
+    insert into wiki.user
     <trim prefix="(" suffix=")" suffixOverrides=",">
       <if test="id != null">
         id,
@@ -136,13 +136,13 @@
     </trim>
   </insert>
   <select id="countByExample" parameterType="com.zzdreamz.wiki.domain.UserExample" resultType="java.lang.Long">
-    select count(*) from wiki..user
+    select count(*) from wiki.user
     <if test="_parameter != null">
       <include refid="Example_Where_Clause" />
     </if>
   </select>
   <update id="updateByExampleSelective" parameterType="map">
-    update wiki..user
+    update wiki.user
     <set>
       <if test="record.id != null">
         id = #{record.id,jdbcType=BIGINT},
@@ -162,7 +162,7 @@
     </if>
   </update>
   <update id="updateByExample" parameterType="map">
-    update wiki..user
+    update wiki.user
     set id = #{record.id,jdbcType=BIGINT},
       login_name = #{record.loginName,jdbcType=VARCHAR},
       `name` = #{record.name,jdbcType=VARCHAR},
@@ -172,7 +172,7 @@
     </if>
   </update>
   <update id="updateByPrimaryKeySelective" parameterType="com.zzdreamz.wiki.domain.User">
-    update wiki..user
+    update wiki.user
     <set>
       <if test="loginName != null">
         login_name = #{loginName,jdbcType=VARCHAR},
@@ -187,7 +187,7 @@
     where id = #{id,jdbcType=BIGINT}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.zzdreamz.wiki.domain.User">
-    update wiki..user
+    update wiki.user
     set login_name = #{loginName,jdbcType=VARCHAR},
       `name` = #{name,jdbcType=VARCHAR},
       `password` = #{password,jdbcType=CHAR}
