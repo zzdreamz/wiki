@@ -1,10 +1,12 @@
 package com.zzdreamz.wiki.controller;
 
+import com.zzdreamz.wiki.req.UserLoginReq;
 import com.zzdreamz.wiki.req.UserQueryReq;
 import com.zzdreamz.wiki.req.UserResetPasswordReq;
 import com.zzdreamz.wiki.req.UserSaveReq;
 import com.zzdreamz.wiki.resp.CommonResp;
 import com.zzdreamz.wiki.resp.PageResp;
+import com.zzdreamz.wiki.resp.UserLoginResp;
 import com.zzdreamz.wiki.resp.UserQueryResp;
 import com.zzdreamz.wiki.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,15 @@ public class UserController {
         req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
         CommonResp resp = new CommonResp<>();
         userService.resetPassword(req);
+        return resp;
+    }
+
+    @PostMapping("/login")
+    public CommonResp login(@Valid @RequestBody UserLoginReq req) {
+        req.setPassword(DigestUtils.md5DigestAsHex(req.getPassword().getBytes()));
+        CommonResp<UserLoginResp> resp = new CommonResp<>();
+        UserLoginResp userLoginResp = userService.login(req);
+        resp.setContent(userLoginResp);
         return resp;
     }
 }

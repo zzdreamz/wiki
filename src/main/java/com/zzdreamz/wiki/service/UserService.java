@@ -7,9 +7,11 @@ import com.zzdreamz.wiki.domain.UserExample;
 import com.zzdreamz.wiki.exception.BusinessException;
 import com.zzdreamz.wiki.exception.BusinessExceptionCode;
 import com.zzdreamz.wiki.mapper.UserMapper;
+import com.zzdreamz.wiki.req.UserLoginReq;
 import com.zzdreamz.wiki.req.UserQueryReq;
 import com.zzdreamz.wiki.req.UserResetPasswordReq;
 import com.zzdreamz.wiki.req.UserSaveReq;
+import com.zzdreamz.wiki.resp.UserLoginResp;
 import com.zzdreamz.wiki.resp.UserQueryResp;
 import com.zzdreamz.wiki.resp.PageResp;
 import com.zzdreamz.wiki.util.CopyUtil;
@@ -84,6 +86,23 @@ public class UserService {
         userMapper.deleteByPrimaryKey(id);
     }
 
+    public void resetPassword(UserResetPasswordReq req) {
+        User user = CopyUtil.copy(req, User.class);
+        userMapper.updateByPrimaryKeySelective(user);
+    }
+
+    public UserLoginResp login(UserLoginReq req) {
+        User userDB = selectByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(userDB) || !userDB.getPassword().equals(req.getPassword())) {
+            // 用户名或密码错误
+            throw new BusinessException(BusinessExceptionCode.USER_LOGIN_ERROR);
+        } else {
+            // 登陆成功
+            UserLoginResp userLoginResp = CopyUtil.copy(userDB, UserLoginResp.class);
+            return userLoginResp;
+        }
+    }
+
     public User selectByLoginName(String loginName) {
         UserExample userExample = new UserExample();
         UserExample.Criteria criteria = userExample.createCriteria();
@@ -96,10 +115,5 @@ public class UserService {
         } else {
             return userList.get(0);
         }
-    }
-
-    public void resetPassword(UserResetPasswordReq req) {
-        User user = CopyUtil.copy(req, User.class);
-        userMapper.updateByPrimaryKeySelective(user);
     }
 }

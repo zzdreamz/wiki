@@ -3,18 +3,20 @@ package com.zzdreamz.wiki.req;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
-public class UserResetPasswordReq {
-    private Long id;
+public class UserLoginReq {
+
+    @NotEmpty(message = "【登录名】不能为空")
+    private String loginName;
 
     @NotEmpty(message = "【密码】不能为空")
     private String password;
 
-    public Long getId() {
-        return id;
+    public String getLoginName() {
+        return loginName;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setLoginName(String loginName) {
+        this.loginName = loginName;
     }
 
     public String getPassword() {
@@ -31,7 +33,7 @@ public class UserResetPasswordReq {
         sb.append(getClass().getSimpleName());
         sb.append(" [");
         sb.append("Hash = ").append(hashCode());
-        sb.append(", id=").append(id);
+        sb.append(", loginName=").append(loginName);
         sb.append(", password=").append(password);
         sb.append("]");
         return sb.toString();

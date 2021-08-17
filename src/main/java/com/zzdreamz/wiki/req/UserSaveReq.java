@@ -2,18 +2,19 @@ package com.zzdreamz.wiki.req;
 
 import org.hibernate.validator.constraints.Length;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
 public class UserSaveReq {
     private Long id;
 
-    @NotNull(message = "【登录名】不能为空")
+    @NotEmpty(message = "【登录名】不能为空")
     private String loginName;
 
-    @NotNull(message = "【昵称】不能为空")
+    @NotEmpty(message = "【昵称】不能为空")
     private String name;
 
-    @NotNull(message = "【密码】不能为空")
+    @NotEmpty(message = "【密码】不能为空")
     private String password;
 
     public Long getId() {
