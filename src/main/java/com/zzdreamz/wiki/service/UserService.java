@@ -69,8 +69,10 @@ public class UserService {
             }
         } else {
             // 修改
-            if (userDB.getId().equals(req.getId())) {
-                userMapper.updateByPrimaryKey(user);
+            if (ObjectUtils.isEmpty(userDB) || userDB.getId().equals(req.getId())) {
+                req.setPassword(null);
+                // Selective表示只会修改不为空的字段
+                userMapper.updateByPrimaryKeySelective(user);
             } else {
                 throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
             }
