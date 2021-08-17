@@ -61,7 +61,7 @@
       @ok="resetHandleOk"
   >
     <a-form :model="user" :label-col="{span: 6}" :wrapper-col="{span: 12}">
-      <a-form-item label="密码">
+      <a-form-item label="新密码">
         <a-input v-model:value="user.password" />
       </a-form-item>
     </a-form>
