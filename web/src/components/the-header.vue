@@ -1,7 +1,7 @@
 <template>
   <a-layout-header class="header">
     <a-row>
-      <a-col :span="20">
+      <a-col :span="22">
         <a-menu
             theme="dark"
             mode="horizontal"
@@ -24,8 +24,14 @@
           </a-menu-item>
         </a-menu>
       </a-col>
-      <a-col :span="4" :push="2">
-        <a-button type="primary" ghost @click="loginModalShow">登录</a-button>
+      <a-col :span="2" >
+        <a-tag color="#3b5999" :model="user" v-show="user.id">
+          <template #icon>
+            <CrownOutlined />
+          </template>
+          欢迎：{{ user.name }}
+        </a-tag>
+        <a-button type="primary" ghost @click="loginModalShow" v-show="!user.id">登录</a-button>
       </a-col>
     </a-row>
   </a-layout-header>
@@ -40,7 +46,7 @@
         <a-input v-model:value="loginUser.loginName" />
       </a-form-item>
       <a-form-item label="密码">
-        <a-input v-model:value="loginUser.password" />
+        <a-input v-model:value="loginUser.password" type="password" />
       </a-form-item>
     </a-form>
   </a-modal>
@@ -63,8 +69,12 @@ export default defineComponent({
     loginModalVisible.value = false;
     const loginModalConfirmLoading = ref();
     loginModalConfirmLoading.value = false;
+    // 用于登录的信息
     const loginUser = ref();
     loginUser.value = {};
+    // 登录后的用户信息
+    const user = ref();
+    user.value = {};
 
     const loginModalShow = () => {
       loginModalVisible.value = true;
@@ -77,9 +87,8 @@ export default defineComponent({
         loginUser.value.password = null;
         const data = response.data;
         if (data.success) {
-          message.success("登陆成功");
           loginModalVisible.value = false;
-          console.log(data.content);
+          user.value = data.content;
         } else {
           message.error(data.message);
         }
@@ -91,6 +100,7 @@ export default defineComponent({
       loginModalVisible,
       loginModalConfirmLoading,
       loginUser,
+      user,
 
       loginModalShow,
       loginHandleOk,
