@@ -1,21 +1,23 @@
 <template>
-  <a-row type="flex" justify="center">
-    <span v-if="level1.length == 0">此电子书没有文档</span>
-    <a-col :span="4">
-      <a-tree
-          v-if="level1!=null && level1.length > 0"
-          class="draggable-tree"
-          :tree-data="level1"
-          :replaceFields="{title: 'name', key: 'id'}"
-          :defaultExpandAll="true"
-          @select="onSelect"
-          :selected-keys="defaultSelected"
-      />
-    </a-col>
-    <a-col :span="12">
-      <div v-html="html" class="wangeditor"></div>
-    </a-col>
-  </a-row>
+
+  <a-layout-content style="padding: 0 50px; margin: 50px">
+    <a-layout style="padding: 24px 0; background: #fff">
+      <a-layout-sider width="200" style="background: #fff">
+        <a-tree
+            v-if="level1!=null && level1.length > 0"
+            class="draggable-tree"
+            :tree-data="level1"
+            :replaceFields="{title: 'name', key: 'id'}"
+            :defaultExpandAll="true"
+            @select="onSelect"
+            :selected-keys="defaultSelected"
+        />
+      </a-layout-sider>
+      <a-layout-content :style="{ padding: '0 24px', minHeight: '280px' }">
+        <div v-html="html" class="wangeditor"></div>
+      </a-layout-content>
+    </a-layout>
+  </a-layout-content>
 </template>
 
 <script lang="ts">
