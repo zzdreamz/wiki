@@ -4,6 +4,8 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.zzdreamz.wiki.domain.User;
 import com.zzdreamz.wiki.domain.UserExample;
+import com.zzdreamz.wiki.exception.BusinessException;
+import com.zzdreamz.wiki.exception.BusinessExceptionCode;
 import com.zzdreamz.wiki.mapper.UserMapper;
 import com.zzdreamz.wiki.req.UserQueryReq;
 import com.zzdreamz.wiki.req.UserSaveReq;
@@ -15,8 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -55,8 +59,12 @@ public class UserService {
         User user = CopyUtil.copy(req, User.class);
         if (ObjectUtils.isEmpty(user.getId())) {
             // 新增
-            user.setId(snowFlake.nextId());
-            userMapper.insert(user);
+            if (ObjectUtils.isEmpty(selectByLoginName(req.getLoginName()))){
+                user.setId(snowFlake.nextId());
+                userMapper.insert(user);
+            } else {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
         } else {
             userMapper.updateByPrimaryKey(user);
         }
@@ -64,5 +72,19 @@ public class UserService {
 
     public void delete(Long id) {
         userMapper.deleteByPrimaryKey(id);
+    }
+
+    public User selectByLoginName(String loginName) {
+        UserExample userExample = new UserExample();
+        UserExample.Criteria criteria = userExample.createCriteria();
+        if (!ObjectUtils.isEmpty(loginName)) {
+            criteria.andLoginNameEqualTo(loginName );
+        }
+        List<User> userList = userMapper.selectByExample(userExample);
+        if (CollectionUtils.isEmpty(userList)) {
+            return null;
+        } else {
+            return userList.get(0);
+        }
     }
 }
