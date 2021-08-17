@@ -57,16 +57,23 @@ public class UserService {
 
     public void save(UserSaveReq req) {
         User user = CopyUtil.copy(req, User.class);
-        if (ObjectUtils.isEmpty(selectByLoginName(req.getLoginName()))) {
-            if (ObjectUtils.isEmpty(user.getId())) {
-                // 新增
+
+        User userDB = selectByLoginName(req.getLoginName());
+        if (ObjectUtils.isEmpty(user.getId())) {
+            // 新增
+            if (ObjectUtils.isEmpty(userDB)) {
                 user.setId(snowFlake.nextId());
                 userMapper.insert(user);
             } else {
-                userMapper.updateByPrimaryKey(user);
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
             }
         } else {
-            throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            // 修改
+            if (userDB.getId().equals(req.getId())) {
+                userMapper.updateByPrimaryKey(user);
+            } else {
+                throw new BusinessException(BusinessExceptionCode.USER_LOGIN_NAME_EXIST);
+            }
         }
     }
 
